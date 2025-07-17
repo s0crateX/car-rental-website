@@ -1,26 +1,28 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import { ThemeProvider } from "@/components/providers/theme-provider";
+import { AuthProvider } from "@/context/auth-provider";
 
 const poppins = localFont({
   src: [
     {
-      path: "../assets/fonts/Poppins-Regular.ttf",
+      path: "../../public/assets/fonts/Poppins-Regular.ttf",
       weight: "400",
       style: "normal",
     },
     {
-      path: "../assets/fonts/Poppins-Italic.ttf",
+      path: "../../public/assets/fonts/Poppins-Italic.ttf",
       weight: "400",
       style: "italic",
     },
     {
-      path: "../assets/fonts/Poppins-Bold.ttf",
+      path: "../../public/assets/fonts/Poppins-Bold.ttf",
       weight: "700",
       style: "normal",
     },
     {
-      path: "../assets/fonts/Poppins-BoldItalic.ttf",
+      path: "../../public/assets/fonts/Poppins-BoldItalic.ttf",
       weight: "700",
       style: "italic",
     },
@@ -39,8 +41,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${poppins.variable} font-sans`}>{children}</body>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${poppins.variable} font-sans`}>
+        <AuthProvider>
+          <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
+        </AuthProvider>
+        </body>
     </html>
   );
 }

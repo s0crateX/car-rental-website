@@ -1,36 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Car Rental Website
+
+This is a car rental website built with Next.js, TypeScript, and Tailwind CSS.
+
+## Folder Structure
+
+The folder structure is organized as follows:
+
+- `src/app`: Contains the core application files, including pages and layouts.
+- `src/assets`: Stores static assets like images, icons, and fonts.
+- `src/components`: Houses reusable UI components, divided into `common`, `layout`, and `ui` subdirectories.
+- `src/config`: Includes configuration files for different environments.
+- `src/constants`: Defines constant values used throughout the application.
+- `src/context`: Manages global state using React Context.
+- `src/data`: Contains local JSON or static data.
+- `src/features`: Organizes domain-specific functionality into modules.
+- `src/hooks`: Holds custom React hooks.
+- `src/lib`: Provides server-side utility functions.
+- `src/services`: Handles API interactions and data fetching.
+- `src/styles`: Contains global CSS and Tailwind CSS configurations.
+- `src/tests`: Includes unit and integration tests.
+- `src/types`: Defines TypeScript types and interfaces.
+- `src/utils`: Offers client-side helper functions.
+- `.vscode`: Stores VS Code settings for consistent development environments.
+- `public`: Contains static files that are publicly accessible.
 
 ## Getting Started
 
-First, run the development server:
+1. **Install dependencies:**
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+   ```bash
+   npm install
+   ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. **Run the development server:**
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+   ```bash
+   npm run dev
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3. **Open the application:**
 
-## Learn More
+   Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-To learn more about Next.js, take a look at the following resources:
+## Scripts
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `npm run dev`: Starts the development server.
+- `npm run build`: Builds the application for production.
+- `npm run start`: Starts the production server.
+- `npm run lint`: Lints the codebase for errors.

@@ -99,15 +99,16 @@ export default function FleetManagementPage() {
   }
 
   return (
-    <div className="flex flex-col md:flex-row h-screen bg-background text-foreground">
+    <div className="relative flex flex-col md:flex-row h-screen bg-background text-foreground">
       <Toaster />
-      <CarList
-        cars={cars}
-        selectedCar={selectedCar}
-        onCarSelect={handleCarSelect}
-        className={`w-full md:w-1/3 border-r border-border ${selectedCar ? 'hidden md:block' : 'block'}`}
-      />
-      <div className={`w-full md:w-2/3 p-4 ${selectedCar ? 'block' : 'hidden md:block'}`}>
+      <div className="w-full md:w-1/3 border-r border-border">
+        <CarList
+          cars={cars}
+          selectedCar={selectedCar}
+          onCarSelect={handleCarSelect}
+        />
+      </div>
+      <div className="hidden md:block w-full md:w-2/3 p-4">
         {selectedCar ? (
           <CarDetails
             car={selectedCar}
@@ -120,6 +121,17 @@ export default function FleetManagementPage() {
           </div>
         )}
       </div>
+
+      {/* Mobile/Tablet Modal for Car Details */}
+      {selectedCar && (
+        <div className="md:hidden fixed inset-0 bg-background z-50">
+          <CarDetails
+            car={selectedCar}
+            onClose={() => setSelectedCar(null)}
+            onVerification={handleVerification}
+          />
+        </div>
+      )}
     </div>
   );
 }

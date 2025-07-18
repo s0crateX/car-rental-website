@@ -1,6 +1,6 @@
-# Car Rental Website
+# GenRide - Car Rental Website
 
-This is a car rental website built with Next.js, TypeScript, and Tailwind CSS.
+This is the repository for the GenRide car rental platform, built with Next.js, TypeScript, and Tailwind CSS.
 
 ## Folder Structure
 

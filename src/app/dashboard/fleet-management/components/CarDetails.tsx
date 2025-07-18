@@ -33,49 +33,49 @@ export function CarDetails({ car, onClose, onVerification }: CarDetailsProps) {
     'Incomplete information',
   ];
   return (
-    <Card className="h-full flex flex-col">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>{`${car.brand} ${car.model} (${car.year})`}</CardTitle>
+    <Card className="h-[calc(100vh-2rem)] md:h-full flex flex-col overflow-hidden max-w-full">
+      <CardHeader className="flex flex-row items-center justify-between p-2 sm:p-4 md:p-6 shrink-0">
+        <CardTitle className="text-base sm:text-lg md:text-xl truncate">{`${car.brand} ${car.model} (${car.year})`}</CardTitle>
         <Button variant="ghost" size="icon" onClick={onClose} className="md:hidden">
           <X className="h-4 w-4" />
         </Button>
       </CardHeader>
-      <ScrollArea className="flex-grow">
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <ScrollArea className="flex-grow overflow-y-auto">
+        <CardContent className="p-2 sm:p-4 md:p-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-6">
             {/* Basic Info */}
-            <div className="space-y-2 md:col-span-1">
-              <h3 className="font-semibold">🏷️ Basic Info</h3>
-              <div className="grid grid-cols-2 gap-1 text-xs">
-                <p><span className="font-medium">Brand:</span> {car.brand}</p>
-                <p><span className="font-medium">Model:</span> {car.model}</p>
-                <p><span className="font-medium">Year:</span> {car.year}</p>
-                <p><span className="font-medium">Type:</span> {car.type}</p>
-                <p><span className="font-medium">Transmission:</span> {car.transmissionType}</p>
-                <p><span className="font-medium">Fuel:</span> {car.fuelType}</p>
+            <div className="space-y-2 sm:space-y-3 md:col-span-1">
+              <h3 className="font-semibold text-sm sm:text-base">🏷️ Basic Info</h3>
+              <div className="grid grid-cols-[max-content_1fr] gap-x-2 sm:gap-x-4 gap-y-1 text-xs sm:text-sm">
+                <p className="font-medium text-muted-foreground">Brand:</p><p>{car.brand}</p>
+                <p className="font-medium text-muted-foreground">Model:</p><p>{car.model}</p>
+                <p className="font-medium text-muted-foreground">Year:</p><p>{car.year}</p>
+                <p className="font-medium text-muted-foreground">Type:</p><p>{car.type}</p>
+                <p className="font-medium text-muted-foreground">Transmission:</p><p>{car.transmissionType}</p>
+                <p className="font-medium text-muted-foreground">Fuel:</p><p>{car.fuelType}</p>
               </div>
             </div>
 
             {/* Capacity */}
-            <div className="space-y-2 md:col-span-1">
-              <h3 className="font-semibold">💺 Capacity</h3>
-              <div className="grid grid-cols-2 gap-1 text-xs">
-                <p><span className="font-medium">Seats:</span> {car.seats}</p>
-                <p><span className="font-medium">Luggage:</span> {car.luggage}</p>
+            <div className="space-y-2 sm:space-y-3 md:col-span-1">
+              <h3 className="font-semibold text-sm sm:text-base">💺 Capacity</h3>
+              <div className="grid grid-cols-[max-content_1fr] gap-x-2 sm:gap-x-4 gap-y-1 text-xs sm:text-sm">
+                <p className="font-medium text-muted-foreground">Seats:</p><p>{car.seats}</p>
+                <p className="font-medium text-muted-foreground">Luggage:</p><p>{car.luggage}</p>
               </div>
             </div>
 
             {/* Pricing */}
-            <div className="space-y-2 md:col-span-1">
-              <h3 className="font-semibold">💵 Pricing</h3>
-              <div className="grid grid-cols-2 gap-1 text-xs">
-                <p><span className="font-medium">Hourly Rate:</span> ₱{car.hourlyRate}</p>
-                <p><span className="font-medium">Delivery:</span> ₱{car.deliveryCharge}</p>
+            <div className="space-y-2 sm:space-y-3 md:col-span-1">
+              <h3 className="font-semibold text-sm sm:text-base">💵 Pricing</h3>
+              <div className="grid grid-cols-[max-content_1fr] gap-x-2 sm:gap-x-4 gap-y-1 text-xs sm:text-sm">
+                <p className="font-medium text-muted-foreground">Hourly Rate:</p><p>₱{car.hourlyRate}</p>
+                <p className="font-medium text-muted-foreground">Delivery:</p><p>₱{car.deliveryCharge}</p>
               </div>
               {car.extraCharges && car.extraCharges.length > 0 && (
-                <div>
-                  <h4 className="font-medium">Extra Charges:</h4>
-                  <div className="flex flex-wrap gap-2 mt-2">
+                <div className="pt-1 sm:pt-2">
+                  <h4 className="font-medium text-xs sm:text-sm text-muted-foreground">Extra Charges:</h4>
+                  <div className="flex flex-wrap gap-1 sm:gap-2 mt-1">
                     {car.extraCharges.map((charge, index) => (
                       <Badge key={index} variant="secondary">{`₱${charge.amount} - ${charge.name}`}</Badge>
                     ))}
@@ -85,9 +85,9 @@ export function CarDetails({ car, onClose, onVerification }: CarDetailsProps) {
             </div>
 
             {/* Features */}
-            <div className="space-y-2 md:col-span-3">
-              <h3 className="font-semibold">📦 Features</h3>
-              <div className="flex flex-wrap gap-2">
+            <div className="space-y-2 sm:space-y-3 md:col-span-3">
+              <h3 className="font-semibold text-sm sm:text-base">📦 Features</h3>
+              <div className="flex flex-wrap gap-1 sm:gap-2">
                 {car.features.map((feature, index) => (
                   <Badge key={index}>{feature}</Badge>
                 ))}
@@ -95,9 +95,9 @@ export function CarDetails({ car, onClose, onVerification }: CarDetailsProps) {
             </div>
 
             {/* Rental Requirements */}
-            <div className="space-y-2 md:col-span-3">
-              <h3 className="font-semibold">📋 Rental Requirements</h3>
-              <ul className="list-disc list-inside text-xs">
+            <div className="space-y-2 sm:space-y-3 md:col-span-3">
+              <h3 className="font-semibold text-sm sm:text-base">📋 Rental Requirements</h3>
+              <ul className="list-disc list-inside text-xs sm:text-sm space-y-1">
                 {car.rentalRequirements.map((req, index) => (
                   <li key={index}>{req}</li>
                 ))}
@@ -105,22 +105,22 @@ export function CarDetails({ car, onClose, onVerification }: CarDetailsProps) {
             </div>
 
             {/* Location */}
-            <div className="space-y-2 md:col-span-3">
-              <h3 className="font-semibold">📍 Location</h3>
-              <p className="text-xs">{car.location.address}</p>
+            <div className="space-y-2 sm:space-y-3 md:col-span-3">
+              <h3 className="font-semibold text-sm sm:text-base">📍 Location</h3>
+              <p className="text-xs sm:text-sm">{car.location.address}</p>
               {/* Optional: Map preview can be added here */}
             </div>
 
             {/* Image Gallery */}
-            <div className="space-y-2 md:col-span-3">
-              <h3 className="font-semibold">🖼️ Image Gallery</h3>
+            <div className="space-y-2 sm:space-y-3 md:col-span-3">
+              <h3 className="font-semibold text-sm sm:text-base">🖼️ Image Gallery</h3>
               <Carousel className="w-full">
                 <CarouselContent>
                   {car.carImageGallery.map((img, index) => (
-                    <CarouselItem key={index} className="basis-1/2 md:basis-1/3 lg:basis-1/4">
+                    <CarouselItem key={index} className="basis-1/2 sm:basis-1/4 md:basis-1/3 lg:basis-1/4">
                       <Dialog>
                         <DialogTrigger asChild>
-                          <img src={img} alt={`Car image ${index + 1}`} className="rounded-md object-cover w-full h-24 cursor-pointer" />
+                          <img src={img} alt={`Car image ${index + 1}`} className="rounded-md object-cover w-full h-16 sm:h-24 cursor-pointer" />
                         </DialogTrigger>
                         <DialogContent className="max-w-4xl">
                           <DialogTitle className="sr-only">Car Image</DialogTitle>
@@ -130,19 +130,19 @@ export function CarDetails({ car, onClose, onVerification }: CarDetailsProps) {
                     </CarouselItem>
                   ))}
                 </CarouselContent>
-                <CarouselPrevious className="left-4" />
-                <CarouselNext className="right-4" />
+                <CarouselPrevious className="-left-2 bg-background/50 hover:bg-background/80" />
+                <CarouselNext className="-right-2 bg-background/50 hover:bg-background/80" />
               </Carousel>
             </div>
 
             {/* Documents */}
-            <div className="space-y-2 md:col-span-3">
-              <h3 className="font-semibold">📄 Documents</h3>
-              <div className="flex flex-wrap gap-4">
+            <div className="space-y-2 sm:space-y-3 md:col-span-3">
+              <h3 className="font-semibold text-sm sm:text-base">📄 Documents</h3>
+              <div className="flex flex-wrap gap-1 sm:gap-2">
                 {car.crDocuments.map((doc, index) => (
                   <Dialog key={index}>
                     <DialogTrigger asChild>
-                      <Button variant="outline">View Document {index + 1}</Button>
+                      <Button variant="outline" size="sm">View CR Doc {index + 1}</Button>
                     </DialogTrigger>
                     <DialogContent className="max-w-4xl p-0">
                       <DialogTitle className="sr-only">Document</DialogTitle>
@@ -169,12 +169,12 @@ export function CarDetails({ car, onClose, onVerification }: CarDetailsProps) {
         </CardContent>
       </ScrollArea>
       <Separator />
-      <div className="p-4 flex justify-end gap-4">
+      <div className="p-2 sm:p-4 flex justify-end gap-2 sm:gap-4 shrink-0 relative bg-background z-20 shadow-[0_-2px_4px_rgba(0,0,0,0.05)]">
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <Button variant="destructive">Reject</Button>
+            <Button variant="destructive" size="sm" className="px-4 py-2 h-9">Reject</Button>
           </AlertDialogTrigger>
-          <AlertDialogContent>
+          <AlertDialogContent className="z-50">
             <AlertDialogHeader>
               <AlertDialogTitle>Reason for Rejection</AlertDialogTitle>
               <AlertDialogDescription>
@@ -219,9 +219,9 @@ export function CarDetails({ car, onClose, onVerification }: CarDetailsProps) {
 
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <Button>Verify</Button>
+            <Button size="sm" className="px-4 py-2 h-9">Verify</Button>
           </AlertDialogTrigger>
-          <AlertDialogContent>
+          <AlertDialogContent className="z-50">
             <AlertDialogHeader>
               <AlertDialogTitle>Are you sure?</AlertDialogTitle>
               <AlertDialogDescription>

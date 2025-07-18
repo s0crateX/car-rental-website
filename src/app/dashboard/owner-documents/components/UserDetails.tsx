@@ -7,8 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
-import Zoom from 'react-medium-image-zoom';
-import 'react-medium-image-zoom/dist/styles.css';
+import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -90,9 +89,11 @@ export function UserDetails({ user, onClose, onVerification, className }: UserDe
                     <CardTitle className="text-base capitalize">{key.replace(/_/g, ' ')}</CardTitle>
                   </CardHeader>
                   <CardContent className="p-2">
-                    <Zoom>
-                      <img src={value.url} alt={key} className="object-cover w-full rounded-md h-24" />
-                    </Zoom>
+                                        <TransformWrapper>
+                      <TransformComponent>
+                        <img src={value.url} alt={key} className="object-cover w-full rounded-md h-24" />
+                      </TransformComponent>
+                    </TransformWrapper>
                     <p className="mt-2 text-sm">Status: <span className={`font-semibold ${value.status.toLowerCase() === 'verified' ? 'text-green-500' : value.status.toLowerCase() === 'rejected' ? 'text-red-500' : 'text-yellow-500'}`}>{value.status}</span></p>
                     {value.status === 'rejected' && value.rejectionReason && (
                       <p className="mt-1 text-xs text-red-500">Reason: {value.rejectionReason}</p>

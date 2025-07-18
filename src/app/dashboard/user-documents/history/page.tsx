@@ -16,8 +16,7 @@ import { DatePickerWithRange } from '@/components/ui/date-range-picker';
 import { format } from 'date-fns';
 import { Preloader } from '@/components/common/preloader';
 import { Download } from 'lucide-react';
-import Zoom from 'react-medium-image-zoom';
-import 'react-medium-image-zoom/dist/styles.css';
+import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 
 interface Document {
   url: string;
@@ -258,9 +257,11 @@ export default function ApprovalHistoryPage() {
                                   <CardTitle className="text-sm capitalize">{key.replace(/_/g, ' ')}</CardTitle>
                                 </CardHeader>
                                 <CardContent className="p-2">
-                                  <Zoom>
-                                    <img src={value?.url} alt={key} className="object-cover w-full rounded-md h-32" />
-                                  </Zoom>
+                                  <TransformWrapper>
+                                    <TransformComponent>
+                                      <img src={value?.url} alt={key} className="object-cover w-full rounded-md h-32" />
+                                    </TransformComponent>
+                                  </TransformWrapper>
                                   <div className="mt-4 space-y-2">
                                     <div className="flex items-center justify-between">
                                       <span className="text-sm font-medium">Status:</span>

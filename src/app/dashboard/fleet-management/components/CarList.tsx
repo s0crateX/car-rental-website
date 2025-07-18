@@ -12,10 +12,9 @@ interface CarListProps {
   cars: Car[];
   selectedCar: Car | null;
   onCarSelect: (car: Car) => void;
-  className?: string;
 }
 
-export function CarList({ cars, selectedCar, onCarSelect, className }: CarListProps) {
+export function CarList({ cars, selectedCar, onCarSelect }: CarListProps) {
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredCars = cars.filter(car => 
@@ -25,7 +24,7 @@ export function CarList({ cars, selectedCar, onCarSelect, className }: CarListPr
   );
 
   return (
-    <div className={className}>
+    <div>
       <CardHeader>
         <CardTitle>Pending Car Approvals</CardTitle>
         <Input 

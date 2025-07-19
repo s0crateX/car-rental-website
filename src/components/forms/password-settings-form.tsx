@@ -34,6 +34,10 @@ const formSchema = z.object({
   path: ["confirmPassword"],
 });
 
+interface FirebaseError extends Error {
+  code: string;
+}
+
 export function PasswordSettingsForm() {
   const { user } = useAuth();
   const [isSaving, setIsSaving] = useState(false);
@@ -60,8 +64,9 @@ export function PasswordSettingsForm() {
       await updatePassword(user, values.newPassword);
       toast.success("Password updated successfully!");
       form.reset();
-    } catch (error: any) {
-      if (error.code === "auth/invalid-credential") {
+    } catch (error) {
+      const firebaseError = error as FirebaseError;
+      if (firebaseError.code === "auth/invalid-credential") {
         toast.error("The current password you entered is incorrect. Please try again.");
       } else {
         toast.error("Error updating password.");
@@ -114,9 +119,9 @@ export function PasswordSettingsForm() {
           )}
         />
         {error && <p className="text-sm font-medium text-destructive">{error}</p>}
-        <ConfirmedButton type="submit" disabled={isSaving} onClick={form.handleSubmit(onSubmit)}>
-          {isSaving ? "Saving..." : "Update Password"}
-        </ConfirmedButton>
+        <Button type="submit" disabled={isSaving}>
+          {isSaving ? 'Saving...' : 'Update Password'}
+        </Button>
       </form>
     </Form>
   );

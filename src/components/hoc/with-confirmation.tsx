@@ -12,7 +12,7 @@ import {
 
 
 
-export function withConfirmation<P extends { onClick: (...args: any[]) => void }>(
+export function withConfirmation<P extends { onClick: (...args: React.MouseEvent[]) => void }>(
   WrappedComponent: ComponentType<P>,
   confirmationProps: {
     title: string;

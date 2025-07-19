@@ -9,12 +9,17 @@ import { Preloader } from '@/components/common/preloader';
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from 'recharts';
 import { Users, Car, FileText, DollarSign } from 'lucide-react';
 
+interface Document {
+  status: string;
+}
+
 interface User {
   id: string;
   fullName: string;
   email: string;
   profileImageUrl: string;
   createdAt: { toDate: () => Date };
+  documents?: Record<string, Document>;
 }
 
 export default function DashboardPage() {
@@ -26,7 +31,7 @@ export default function DashboardPage() {
     pendingCarApprovals: 0,
   });
   const [recentUsers, setRecentUsers] = useState<User[]>([]);
-  const [userGrowthData, setUserGrowthData] = useState<any[]>([]);
+  const [userGrowthData, setUserGrowthData] = useState<{ name: string; total: number }[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -60,9 +65,9 @@ export default function DashboardPage() {
 
         // Fetch pending user documents
         const pendingDocsUsers = usersData.filter(user => {
-            const documents = (user as any).documents;
+            const documents = user.documents;
             if (!documents) return false;
-            return Object.values(documents).some((doc: any) => doc.status === 'pending');
+            return Object.values(documents).some((doc) => doc.status === 'pending');
         });
         setStats(prev => ({ ...prev, pendingUserDocs: pendingDocsUsers.length }));
 

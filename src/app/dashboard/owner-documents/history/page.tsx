@@ -12,11 +12,14 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { DateRange } from 'react-day-picker';
+
 import { DatePickerWithRange } from '@/components/ui/date-range-picker';
 import { format } from 'date-fns';
 import { Preloader } from '@/components/common/preloader';
 import { Download } from 'lucide-react';
-import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
+import Image from 'next/image';
+import { ImageZoomModal } from '@/components/common/ImageZoomModal';
 
 interface Document {
   url: string;
@@ -34,7 +37,7 @@ interface User {
   documents: {
     [key: string]: Document | undefined;
   };
-  lastDocumentUpdate?: Timestamp;
+  lastDocumentUpdate?: Timestamp | null;
 }
 
 type FilterStatus = 'all' | 'verified' | 'rejected';
@@ -45,8 +48,17 @@ export default function OwnerApprovalHistoryPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<FilterStatus>('all');
-  const [dateRange, setDateRange] = useState<{ from: Date; to: Date } | undefined>();
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [expandedUsers, setExpandedUsers] = useState<Set<string>>(new Set());
+  const [selectedImage, setSelectedImage] = useState<{ url: string; title: string } | null>(null);
+
+  const openImageModal = (url: string, title: string) => {
+    setSelectedImage({ url, title });
+  };
+
+  const closeImageModal = () => {
+    setSelectedImage(null);
+  };
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -63,8 +75,8 @@ export default function OwnerApprovalHistoryPage() {
       const processedUsers: User[] = [];
       
       querySnapshot.forEach((doc) => {
-        const userData = doc.data();
-        const documents = userData.documents;
+        const userData = doc.data() as User;
+        const documents = userData.documents as { [key: string]: Document };
         
         if (documents) {
           const hasProcessedDocument = Object.values(documents).some(
@@ -73,7 +85,6 @@ export default function OwnerApprovalHistoryPage() {
 
           if (hasProcessedDocument) {
             processedUsers.push({
-              id: doc.id,
               ...userData,
               lastDocumentUpdate: userData.lastDocumentUpdate || null
             });
@@ -110,10 +121,12 @@ export default function OwnerApprovalHistoryPage() {
 
     // Apply date range filter
     if (dateRange?.from && dateRange?.to) {
+      const fromDate = dateRange.from;
+      const toDate = dateRange.to;
       filtered = filtered.filter(user => {
         if (!user.lastDocumentUpdate) return false;
         const updateDate = user.lastDocumentUpdate.toDate();
-        return updateDate >= dateRange.from && updateDate <= dateRange.to;
+        return updateDate >= fromDate && updateDate <= toDate;
       });
     }
 
@@ -214,90 +227,94 @@ export default function OwnerApprovalHistoryPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredUsers.map((user) => (
-                  <React.Fragment key={user.id}>
-                    <TableRow>
-                      <TableCell>
-                        <div className="flex items-center space-x-4">
-                          <Avatar>
-                            <AvatarImage src={user.profileImageUrl} alt={user.fullName} />
-                            <AvatarFallback>{user.fullName.charAt(0)}</AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <div className="font-medium">{user.fullName}</div>
-                            <div className="text-sm text-muted-foreground">{user.email}</div>
-                          </div>
+                {filteredUsers.map((user) => [
+                  <TableRow key={user.id}>
+                    <TableCell>
+                      <div className="flex items-center space-x-4">
+                        <Avatar>
+                          <AvatarImage src={user.profileImageUrl} alt={user.fullName} />
+                          <AvatarFallback>{user.fullName.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <div className="font-medium">{user.fullName}</div>
+                          <div className="text-sm text-muted-foreground">{user.email}</div>
                         </div>
-                      </TableCell>
-                      <TableCell>
-                        {Object.values(user.documents).every(doc => doc?.status === 'verified') ? (
-                          <Badge variant="success">Verified ✅</Badge>
-                        ) : (
-                          <Badge variant="destructive">Rejected ❌</Badge>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {user.lastDocumentUpdate
-                          ? format(user.lastDocumentUpdate.toDate(), 'PPpp')
-                          : 'N/A'}
-                      </TableCell>
-                      <TableCell>
-                        <Button variant="ghost" size="sm" onClick={() => toggleUserExpanded(user.id)}>
-                          {expandedUsers.has(user.id) ? 'Hide Details' : 'View Details'}
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                    {expandedUsers.has(user.id) && (
-                      <TableRow>
-                        <TableCell colSpan={4} className="p-0">
-                          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 p-3 bg-muted/50">
-                            {Object.entries(user.documents).map(([key, value]) => (
-                              <Card key={key} className="overflow-hidden">
-                                <CardHeader className="py-2">
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {Object.values(user.documents).every(doc => doc?.status === 'verified') ? (
+                        <Badge variant="success">Verified ✅</Badge>
+                      ) : (
+                        <Badge variant="destructive">Rejected ❌</Badge>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {user.lastDocumentUpdate
+                        ? format(user.lastDocumentUpdate.toDate(), 'PPpp')
+                        : 'N/A'}
+                    </TableCell>
+                    <TableCell>
+                      <Button variant="ghost" size="sm" onClick={() => toggleUserExpanded(user.id)}>
+                        {expandedUsers.has(user.id) ? 'Hide Details' : 'View Details'}
+                      </Button>
+                    </TableCell>
+                  </TableRow>,
+                  expandedUsers.has(user.id) && (
+                    <TableRow key={`${user.id}-details`}>
+                      <TableCell colSpan={4} className="p-0">
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 p-3 bg-muted/50">
+                          {Object.entries(user.documents).map(([key, value]) => value && (
+                            <Card key={key} className="overflow-hidden">
+                              <CardHeader className="py-2">
                                   <CardTitle className="text-sm capitalize">{key.replace(/_/g, ' ')}</CardTitle>
                                 </CardHeader>
                                 <CardContent className="p-2">
-                                  <TransformWrapper>
-                                    <TransformComponent>
-                                      <img src={value?.url} alt={key} className="object-cover w-full rounded-md h-32" />
-                                    </TransformComponent>
-                                  </TransformWrapper>
+                                  <div className="relative w-full h-40 cursor-pointer" onClick={() => openImageModal(value.url, key.replace(/_/g, ' '))}>
+                                    <Image src={value.url} alt={`Document for ${key}`} layout="fill" objectFit="cover" className="rounded-md" />
+                                  </div>
                                   <div className="mt-4 space-y-2">
                                     <div className="flex items-center justify-between">
                                       <span className="text-sm font-medium">Status:</span>
-                                      <Badge
-                                        variant={value?.status === 'verified' ? 'success' : 'destructive'}
-                                      >
-                                        {value?.status}
-                                      </Badge>
-                                    </div>
-                                    {value?.rejectionReason && (
-                                      <div className="text-sm text-muted-foreground">
-                                        <span className="font-medium">Rejection Reason:</span>
-                                        <p className="mt-1">{value.rejectionReason}</p>
-                                      </div>
-                                    )}
-                                    {value?.updatedAt && (
-                                      <div className="text-sm text-muted-foreground">
-                                        <span className="font-medium">Updated At:</span>
-                                        <p className="mt-1">{format(value.updatedAt.toDate(), 'PPpp')}</p>
-                                      </div>
-                                    )}
+                                    <Badge
+                                      variant={value?.status === 'verified' ? 'success' : 'destructive'}
+                                    >
+                                      {value?.status}
+                                    </Badge>
                                   </div>
-                                </CardContent>
-                              </Card>
-                            ))}
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </React.Fragment>
-                ))}
+                                  {value?.rejectionReason && (
+                                    <div className="text-sm text-muted-foreground">
+                                      <span className="font-medium">Rejection Reason:</span>
+                                      <p className="mt-1">{value.rejectionReason}</p>
+                                    </div>
+                                  )}
+                                  {value?.updatedAt && (
+                                    <div className="text-sm text-muted-foreground">
+                                      <span className="font-medium">Updated At:</span>
+                                      <p className="mt-1">{format(value.updatedAt.toDate(), 'PPpp')}</p>
+                                    </div>
+                                  )}
+                                </div>
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )
+                ])}
               </TableBody>
             </Table>
           </ScrollArea>
         </CardContent>
       </Card>
+
+      {selectedImage && (
+        <ImageZoomModal
+          isOpen={!!selectedImage}
+          onClose={closeImageModal}
+          imageUrl={selectedImage.url}
+        />
+      )}
     </div>
   );
 }

@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
-import { withConfirmation } from "@/components/hoc/with-confirmation";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -22,10 +22,7 @@ import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-const ConfirmedButton = withConfirmation(Button, {
-  title: "Are you sure?",
-  description: "This will update your profile information.",
-});
+
 
 const formSchema = z.object({
   fullName: z.string().min(2, {
@@ -37,6 +34,7 @@ const formSchema = z.object({
 export function GeneralSettingsForm() {
   const { user } = useAuth();
   const [isSaving, setIsSaving] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -70,6 +68,7 @@ export function GeneralSettingsForm() {
       const userDocRef = doc(db, "users", user.uid);
       await updateDoc(userDocRef, values);
       toast.success("Profile updated successfully!");
+      setIsDialogOpen(false);
     } catch (error) {
       toast.error("Error updating profile.");
     } finally {
@@ -112,13 +111,25 @@ export function GeneralSettingsForm() {
             </FormItem>
           )}
         />
-        <ConfirmedButton
-          type="button"
-          disabled={isSaving}
-          onClick={form.handleSubmit(onSubmit)}
-        >
-          {isSaving ? "Saving..." : "Save changes"}
-        </ConfirmedButton>
+        <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <AlertDialogTrigger asChild>
+            <Button type="button">Save Changes</Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action will update your profile information.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={form.handleSubmit(onSubmit)} disabled={isSaving}>
+                {isSaving ? "Saving..." : "Continue"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </form>
     </Form>
   );

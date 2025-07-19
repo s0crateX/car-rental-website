@@ -4,12 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
-// A simplified User interface for this component's needs
-interface User {
-  id: string;
-  fullName: string;
-  profileImageUrl: string;
-}
+import { User } from '@/types/user';
 
 interface UserListProps {
   users: User[];

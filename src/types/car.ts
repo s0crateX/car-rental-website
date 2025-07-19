@@ -19,6 +19,7 @@ export interface Car {
   };
   carImageGallery: string[];
   crDocuments: string[];
+  orDocuments: string[];
   carOwnerFullName: string;
   carOwnerDocumentId: string;
   availabilityStatus: string;
@@ -27,7 +28,7 @@ export interface Car {
     amount: number;
     name: string;
   }>;
-  createdAt: any; // Consider using Firestore Timestamp type here
+  createdAt: { toDate: () => Date };
   description: string;
   rating: number;
   reviewCount: number;

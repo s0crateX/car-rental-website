@@ -48,6 +48,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import * as React from "react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import Image from 'next/image';
 
 const ListItem = React.forwardRef<
   React.ElementRef<"a">,
@@ -123,7 +124,12 @@ export function Navbar() {
             console.log('User document found:', userDoc.data());
             if (userDoc.data().userRole === "admin") {
               console.log('User is an admin, setting admin data.');
-              setAdminData(userDoc.data() as any);
+              setAdminData(userDoc.data() as {
+                fullName: string;
+                email: string;
+                profileImageUrl: string;
+                userRole: string;
+              });
             } else {
               console.log('User is not an admin.');
             }
@@ -157,7 +163,7 @@ export function Navbar() {
         <div className="flex items-center gap-2 min-w-0">
           <Link href="/dashboard" className="flex items-center gap-2">
             <div className="relative flex items-center justify-center w-8 h-8 rounded-xl">
-              <img src="/assets/images/logo.png" alt="GenRide Logo" className="w-8 h-8" />
+              <Image src="/assets/images/logo.png" alt="GenRide Logo" width={32} height={32} />
             </div>
             <div className="hidden sm:block">
               <h1 className="text-lg font-bold">
@@ -319,7 +325,7 @@ export function Navbar() {
                   <SheetTitle className="text-left">
                     <Link href="/dashboard" className="flex items-center gap-2">
                       <div className="relative flex items-center justify-center w-8 h-8 rounded-xl">
-                        <img src="/assets/images/logo.png" alt="GenRide Logo" className="w-8 h-8" />
+                        <Image src="/assets/images/logo.png" alt="GenRide Logo" width={32} height={32} />
                       </div>
                       <div>
                         <h1 className="text-lg font-bold">

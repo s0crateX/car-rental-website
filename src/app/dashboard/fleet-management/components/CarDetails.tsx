@@ -6,15 +6,16 @@ import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useState } from 'react';
-import { X, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
+import { X } from 'lucide-react';
 import { Car } from '@/types/car';
-import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
+import Image from 'next/image';
+import { ImageZoomModal } from '@/components/common/ImageZoomModal';
 
 interface CarDetailsProps {
   car: Car;
@@ -25,6 +26,7 @@ interface CarDetailsProps {
 export function CarDetails({ car, onClose, onVerification }: CarDetailsProps) {
   const [rejectionReason, setRejectionReason] = useState('');
   const [customRejectionReason, setCustomRejectionReason] = useState('');
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const commonRejectionReasons = [
     'Invalid/unclear documents',
@@ -117,16 +119,10 @@ export function CarDetails({ car, onClose, onVerification }: CarDetailsProps) {
               <Carousel className="w-full">
                 <CarouselContent>
                   {car.carImageGallery.map((img, index) => (
-                    <CarouselItem key={index} className="basis-1/2 sm:basis-1/4 md:basis-1/3 lg:basis-1/4">
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <img src={img} alt={`Car image ${index + 1}`} className="rounded-md object-cover w-full h-16 sm:h-24 cursor-pointer" />
-                        </DialogTrigger>
-                        <DialogContent className="max-w-4xl">
-                          <DialogTitle className="sr-only">Car Image</DialogTitle>
-                          <img src={img} alt={`Car image ${index + 1}`} className="rounded-lg object-contain w-full h-full" />
-                        </DialogContent>
-                      </Dialog>
+                    <CarouselItem key={index} className="basis-1/3 md:basis-1/4 lg:basis-1/5">
+                      <div className="p-1">
+                        <Image src={img} alt={`Car image ${index + 1}`} width={96} height={96} className="rounded-md object-cover w-full h-16 sm:h-24 cursor-pointer" onClick={() => setSelectedImage(img)} />
+                      </div>
                     </CarouselItem>
                   ))}
                 </CarouselContent>
@@ -138,36 +134,32 @@ export function CarDetails({ car, onClose, onVerification }: CarDetailsProps) {
             {/* Documents */}
             <div className="space-y-2 sm:space-y-3 md:col-span-3">
               <h3 className="font-semibold text-sm sm:text-base">📄 Documents</h3>
-              <div className="flex flex-wrap gap-1 sm:gap-2">
-                {car.crDocuments.map((doc, index) => (
-                  <Dialog key={index}>
-                    <DialogTrigger asChild>
-                      <Button variant="outline" size="sm">View CR Doc {index + 1}</Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-4xl p-0">
-                      <DialogTitle className="sr-only">Document</DialogTitle>
-                      <TransformWrapper>
-                        {({ zoomIn, zoomOut, resetTransform }) => (
-                          <>
-                            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex gap-2">
-                              <Button size="icon" variant="outline" onClick={() => zoomIn()}><ZoomIn className="h-4 w-4" /></Button>
-                              <Button size="icon" variant="outline" onClick={() => zoomOut()}><ZoomOut className="h-4 w-4" /></Button>
-                              <Button size="icon" variant="outline" onClick={() => resetTransform()}><RotateCcw className="h-4 w-4" /></Button>
-                            </div>
-                            <TransformComponent wrapperStyle={{ width: '100%', height: '80vh' }}>
-                              <img src={doc} alt={`Document ${index + 1}`} className="w-full h-full object-contain" />
-                            </TransformComponent>
-                          </>
-                        )}
-                      </TransformWrapper>
-                    </DialogContent>
-                  </Dialog>
-                ))}
-              </div>
+              <Carousel className="w-full">
+                <CarouselContent>
+                  {[...car.crDocuments, ...car.orDocuments].map((doc, index) => (
+                    <CarouselItem key={index} className="basis-1/3 md:basis-1/4 lg:basis-1/5">
+                      <div className="p-1">
+                        <Image src={doc} alt={`Document ${index + 1}`} width={96} height={96} className="rounded-md object-cover w-full h-16 sm:h-24 cursor-pointer" onClick={() => setSelectedImage(doc)} />
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious className="-left-2 bg-background/50 hover:bg-background/80" />
+                <CarouselNext className="-right-2 bg-background/50 hover:bg-background/80" />
+              </Carousel>
             </div>
           </div>
         </CardContent>
       </ScrollArea>
+
+      {selectedImage && (
+        <ImageZoomModal
+          imageUrl={selectedImage}
+          isOpen={!!selectedImage}
+          onClose={() => setSelectedImage(null)}
+        />
+      )}
+
       <Separator />
       <div className="p-2 sm:p-4 flex justify-end gap-2 sm:gap-4 shrink-0 relative bg-background z-20 shadow-[0_-2px_4px_rgba(0,0,0,0.05)]">
         <AlertDialog>

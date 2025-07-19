@@ -10,10 +10,11 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Toaster, toast } from 'sonner';
 import { Preloader } from '@/components/common/preloader';
-import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
+import { ImageZoomModal } from '@/components/common/ImageZoomModal';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import Image from 'next/image';
 
 interface Document {
   url: string;
@@ -47,6 +48,8 @@ export default function PendingApprovalsPage() {
   const [loading, setLoading] = useState(true);
   const [rejectionReason, setRejectionReason] = useState('');
   const [customRejectionReason, setCustomRejectionReason] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedImageUrl, setSelectedImageUrl] = useState('');
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -60,7 +63,7 @@ export default function PendingApprovalsPage() {
         const documents = userData.documents;
         if (documents) {
           const hasPending = Object.values(documents).some(
-            (doc) => doc.status && doc.status.toLowerCase() === 'pending'
+            (doc) => doc && doc.status && doc.status.toLowerCase() === 'pending'
           );
           if (hasPending) {
             pendingUsers.push({ id: doc.id, ...userData });
@@ -85,7 +88,7 @@ export default function PendingApprovalsPage() {
     const statusField = `documents.${documentName}.status`;
     const reasonField = `documents.${documentName}.rejectionReason`;
 
-    const updateData: { [key: string]: any } = {
+    const updateData: { [key: string]: string | Date } = {
       [statusField]: status,
       lastDocumentUpdate: new Date(),
     };
@@ -119,7 +122,7 @@ export default function PendingApprovalsPage() {
       // After verification, filter out users with no more pending documents
       const stillPendingUsers = updatedUsers.filter(user => {
         if (!user.documents) return false;
-        return Object.values(user.documents).some(doc => doc.status && doc.status.toLowerCase() === 'pending');
+        return Object.values(user.documents).some(doc => doc && doc.status && doc.status.toLowerCase() === 'pending');
       });
 
       setUsers(stillPendingUsers);
@@ -195,13 +198,19 @@ export default function PendingApprovalsPage() {
                         <CardTitle className="text-base capitalize">{key.replace(/_/g, ' ')}</CardTitle>
                       </CardHeader>
                       <CardContent>
-                                                <TransformWrapper>
-                          <TransformComponent>
-                            <img src={value.url} alt={key} className="object-cover w-full rounded-md h-40" />
-                          </TransformComponent>
-                        </TransformWrapper>
-                        <p className="mt-2 text-sm">Status: <span className={`font-semibold ${value.status && value.status.toLowerCase() === 'verified' ? 'text-green-500' : value.status && value.status.toLowerCase() === 'rejected' ? 'text-red-500' : 'text-yellow-500'}`}>{value.status}</span></p>
-                        {value.status === 'rejected' && value.rejectionReason && (
+                        <div
+                          className="relative w-full h-48 cursor-pointer"
+                          onClick={() => {
+                            if (value) {
+                              setSelectedImageUrl(value.url);
+                              setIsModalOpen(true);
+                            }
+                          }}
+                        >
+                          {value && <Image src={value.url} alt={key} layout="fill" objectFit="cover" className="rounded-md" />}
+                        </div>
+                        {value && <p className="mt-2 text-sm">Status: <span className={`font-semibold ${value.status && value.status.toLowerCase() === 'verified' ? 'text-green-500' : value.status && value.status.toLowerCase() === 'rejected' ? 'text-red-500' : 'text-yellow-500'}`}>{value.status}</span></p>}
+                        {value && value.status === 'rejected' && value.rejectionReason && (
                           <p className="mt-1 text-xs text-red-500">Reason: {value.rejectionReason}</p>
                         )}
                         <div className="flex gap-2 mt-2">
@@ -281,6 +290,11 @@ export default function PendingApprovalsPage() {
           </div>
         )}
       </div>
+      <ImageZoomModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        imageUrl={selectedImageUrl}
+      />
     </div>
   );
 }

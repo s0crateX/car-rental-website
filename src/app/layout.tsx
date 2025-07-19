@@ -31,13 +31,14 @@ const poppins = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "GenRide - Premium Car Rental Service",
-  description: "Experience premium car rentals with GenRide. Find and rent your perfect vehicle today.",
+  title: "GenRide - Car Rental Service",
+  description: "GenRide is your trusted car rental service in General Santos City. Book reliable and affordable vehicles for your travel needs today.",
   icons: {
     icon: "/assets/images/favicon.ico",
     apple: "/assets/images/apple-touch-icon.png",
   },
 };
+
 
 import { Toaster } from "sonner";
 

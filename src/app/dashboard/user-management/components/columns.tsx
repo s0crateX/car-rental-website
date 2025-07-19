@@ -5,33 +5,7 @@ import { MoreHorizontal, ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Timestamp } from 'firebase/firestore';
-
-export interface User {
-  id: string;
-  address: string;
-  createdAt: Timestamp;
-  dob: string;
-  documents: {
-    [key: string]: {
-      url: string;
-      status: string;
-    };
-  };
-  email: string;
-  emailVerified: boolean;
-  emergencyContact: string;
-  fullName: string;
-  lastLogin: Timestamp;
-  location: {
-    latitude: number;
-    longitude: number;
-  };
-  phoneNumber: string;
-  profileComplete: boolean;
-  profileImageUrl: string;
-  userRole: 'admin' | 'customer' | 'car_owner';
-}
+import { User } from "../page";
 
 export const columns: ColumnDef<User>[] = [
   {

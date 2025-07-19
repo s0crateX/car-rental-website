@@ -83,9 +83,9 @@ export function ProfilePictureForm() {
 
       <Input type="file" onChange={handleFileChange} disabled={isUploading} className="hidden" />
 
-      <ConfirmedButton onClick={() => document.querySelector<HTMLInputElement>('input[type="file"]')?.click()} disabled={isUploading}>
+      <Button onClick={() => document.querySelector<HTMLInputElement>('input[type="file"]')?.click()} disabled={isUploading}>
         {isUploading ? "Uploading..." : "Upload Image"}
-      </ConfirmedButton>
+      </Button>
     </div>
   );
 }

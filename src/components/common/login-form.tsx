@@ -30,6 +30,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import Image from 'next/image';
 
 const formSchema = z.object({
   email: z.string().email({
@@ -39,6 +40,10 @@ const formSchema = z.object({
     message: "Password must be at least 6 characters.",
   }),
 });
+
+interface FirebaseError extends Error {
+  code: string;
+}
 
 interface LockoutState {
   attempts: number;
@@ -147,15 +152,16 @@ export function LoginForm() {
         setError("Access denied: Admins only.");
         handleFailedAttempt();
       }
-    } catch (error: any) {
+    } catch (error) {
+      const firebaseError = error as FirebaseError;
       // Log the error for debugging but don't let it bubble up
       console.log(`Authentication failed for email: ${values.email}`, {
-        code: error.code,
-        message: error.message
+        code: firebaseError.code,
+        message: firebaseError.message
       });
       
       // Handle specific Firebase auth errors
-      switch (error.code) {
+      switch (firebaseError.code) {
         case 'auth/invalid-credential':
           setError("The email or password you entered is incorrect. Please check your credentials and try again.");
           break;
@@ -182,7 +188,7 @@ export function LoginForm() {
           break;
         default:
           setError("An unexpected error occurred. Please try again.");
-          console.log('Unhandled auth error:', error.code, error.message);
+          console.log('Unhandled auth error:', firebaseError.code, firebaseError.message);
       }
       
       handleFailedAttempt();
@@ -203,7 +209,7 @@ export function LoginForm() {
           )}
           <CardHeader className="text-center">
             <div className="flex justify-center items-center mb-4">
-              <img src="/assets/images/logo.png" alt="GenRide Logo" className="w-16 h-16" />
+              <Image src="/assets/images/logo.png" alt="GenRide Logo" width={64} height={64} />
             </div>
             <CardTitle className="text-2xl font-bold">Welcome to GenRide</CardTitle>
             <CardDescription>

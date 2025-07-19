@@ -7,26 +7,7 @@ import { Toaster, toast } from 'sonner';
 import { Preloader } from '@/components/common/preloader';
 import { UserList } from '../components/UserList';
 import { UserDetails } from '../components/UserDetails';
-
-interface Document {
-  url: string;
-  status: string;
-  rejectionReason?: string;
-}
-
-interface User {
-  id: string;
-  fullName: string;
-  email: string;
-  phoneNumber: string;
-  organizationName: string;
-  profileImageUrl: string;
-  documents: {
-    [key: string]: Document | undefined;
-  };
-}
-
-
+import { User } from '@/types/user';
 
 export default function PendingCarOwnerApprovalsPage() {
   const [users, setUsers] = useState<User[]>([]);
@@ -46,7 +27,7 @@ export default function PendingCarOwnerApprovalsPage() {
         const documents = userData.documents;
         if (documents) {
           const hasPending = Object.values(documents).some(
-            (doc) => doc.status && doc.status.toLowerCase() === 'pending'
+            (doc) => doc && doc.status && doc.status.toLowerCase() === 'pending'
           );
           if (hasPending) {
             pendingUsers.push({ id: doc.id, ...userData });
@@ -71,7 +52,7 @@ export default function PendingCarOwnerApprovalsPage() {
     const statusField = `documents.${documentName}.status`;
     const reasonField = `documents.${documentName}.rejectionReason`;
 
-    const updateData: { [key: string]: any } = {
+    const updateData: { [key: string]: string | Date } = {
       [statusField]: status,
       lastDocumentUpdate: new Date(),
     };
@@ -105,7 +86,7 @@ export default function PendingCarOwnerApprovalsPage() {
       // After verification, filter out users with no more pending documents
       const stillPendingUsers = updatedUsers.filter(user => {
         if (!user.documents) return false;
-        return Object.values(user.documents).some(doc => doc.status && doc.status.toLowerCase() === 'pending');
+        return Object.values(user.documents).some(doc => doc && doc.status && doc.status.toLowerCase() === 'pending');
       });
 
       setUsers(stillPendingUsers);

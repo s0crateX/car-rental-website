@@ -2,9 +2,9 @@ import { NextResponse } from "next/server";
 import ImageKit from "imagekit";
 
 const imageKit = new ImageKit({
-  publicKey: process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY!,
-  privateKey: process.env.IMAGEKIT_PRIVATE_KEY!,
-  urlEndpoint: process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT!,
+  publicKey: "public_7ku11Hwcqengziun/w6sjXqyWT0=",
+  privateKey: "private_hRbgu49ltzPvLrVCqZKyzMfNDW8=",
+  urlEndpoint: "https://ik.imagekit.io/carrental/",
 });
 
 export async function POST(request: Request) {

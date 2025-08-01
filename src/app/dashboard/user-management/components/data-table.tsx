@@ -11,9 +11,10 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   onUserSelect: (user: TData) => void;
+  onDeleteUser: (userId: string) => void;
 }
 
-export function DataTable<TData, TValue>({ columns, data, onUserSelect }: DataTableProps<TData, TValue>) {
+export function DataTable<TData, TValue>({ columns, data, onUserSelect, onDeleteUser }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = useState('');
@@ -35,6 +36,7 @@ export function DataTable<TData, TValue>({ columns, data, onUserSelect }: DataTa
     },
     meta: {
       onUserSelect,
+      onDeleteUser,
     },
   });
 

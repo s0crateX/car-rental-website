@@ -105,6 +105,7 @@ const ownerComponents: { title: string; href: string; description: string }[] = 
 export function Navbar() {
   const router = useRouter();
   const { user } = useAuth();
+  const [isSheetOpen, setIsSheetOpen] = React.useState(false);
   const [adminData, setAdminData] = React.useState<{
     fullName: string;
     email: string;
@@ -154,6 +155,11 @@ export function Navbar() {
     } catch (error) {
       console.error('Error signing out:', error);
     }
+  };
+
+  const handleNavigation = (href: string) => {
+    setIsSheetOpen(false);
+    router.push(href);
   };
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -313,7 +319,7 @@ export function Navbar() {
 
           {/* Mobile Menu Button - Enhanced */}
           <div className="lg:hidden">
-            <Sheet>
+            <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-accent hover:text-accent-foreground transition-all duration-200 rounded-xl hover:shadow-sm">
                   <MenuIcon className="h-4 w-4 text-muted-foreground" />
@@ -337,15 +343,14 @@ export function Navbar() {
                   </SheetTitle>
                 </SheetHeader>
                 <nav className="flex flex-col gap-1 p-4">
-                  <Link href="/dashboard" className="w-full">
-                    <Button 
-                      variant="ghost" 
-                      className="justify-start h-10 px-3 text-sm gap-3 hover:bg-accent hover:text-accent-foreground transition-all duration-200 rounded-lg font-medium text-muted-foreground w-full"
-                    >
-                      <Home className="h-4 w-4" />
-                      Dashboard
-                    </Button>
-                  </Link>
+                  <Button 
+                    variant="ghost" 
+                    className="justify-start h-10 px-3 text-sm gap-3 hover:bg-accent hover:text-accent-foreground transition-all duration-200 rounded-lg font-medium text-muted-foreground w-full"
+                    onClick={() => handleNavigation('/dashboard')}
+                  >
+                    <Home className="h-4 w-4" />
+                    Dashboard
+                  </Button>
                   <Accordion type="single" collapsible className="w-full">
                     <AccordionItem value="user-documents" className="border-b-0">
                       <AccordionTrigger className="justify-start h-10 px-3 text-sm gap-3 hover:bg-accent hover:text-accent-foreground transition-all duration-200 rounded-lg font-medium text-muted-foreground hover:no-underline">
@@ -357,13 +362,13 @@ export function Navbar() {
                       <AccordionContent className="pl-8 pr-2 pb-0">
                         <nav className="flex flex-col gap-1 py-2">
                           {userComponents.map((component) => (
-                            <Link 
-                              key={component.title} 
-                              href={component.href}
-                              className="block select-none space-y-1 rounded-md p-2 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                            <button
+                              key={component.title}
+                              onClick={() => handleNavigation(component.href)}
+                              className="block select-none space-y-1 rounded-md p-2 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground text-left w-full"
                             >
                               {component.title}
-                            </Link>
+                            </button>
                           ))}
                         </nav>
                       </AccordionContent>
@@ -378,47 +383,44 @@ export function Navbar() {
                       <AccordionContent className="pl-8 pr-2 pb-0">
                         <nav className="flex flex-col gap-1 py-2">
                           {ownerComponents.map((component) => (
-                            <Link 
-                              key={component.title} 
-                              href={component.href}
-                              className="block select-none space-y-1 rounded-md p-2 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                            <button
+                              key={component.title}
+                              onClick={() => handleNavigation(component.href)}
+                              className="block select-none space-y-1 rounded-md p-2 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground text-left w-full"
                             >
                               {component.title}
-                            </Link>
+                            </button>
                           ))}
                         </nav>
                       </AccordionContent>
                     </AccordionItem>
                   </Accordion>
-                  <Link href="/dashboard/fleet-management" className="w-full">
-                    <Button 
-                      variant="ghost" 
-                      className="justify-start h-10 px-3 text-sm gap-3 hover:bg-accent hover:text-accent-foreground transition-all duration-200 rounded-lg font-medium text-muted-foreground w-full"
-                    >
-                      <Car className="h-4 w-4" />
-                      Fleet Management
-                    </Button>
-                  </Link>
-                  <Link href="/dashboard/user-management" className="w-full">
-                    <Button 
-                      variant="ghost" 
-                      className="justify-start h-10 px-3 text-sm gap-3 hover:bg-accent hover:text-accent-foreground transition-all duration-200 rounded-lg font-medium text-muted-foreground w-full"
-                    >
-                      <Users className="h-4 w-4" />
-                      User Management
-                    </Button>
-                  </Link>
+                  <Button 
+                    variant="ghost" 
+                    className="justify-start h-10 px-3 text-sm gap-3 hover:bg-accent hover:text-accent-foreground transition-all duration-200 rounded-lg font-medium text-muted-foreground w-full"
+                    onClick={() => handleNavigation('/dashboard/fleet-management')}
+                  >
+                    <Car className="h-4 w-4" />
+                    Fleet Management
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    className="justify-start h-10 px-3 text-sm gap-3 hover:bg-accent hover:text-accent-foreground transition-all duration-200 rounded-lg font-medium text-muted-foreground w-full"
+                    onClick={() => handleNavigation('/dashboard/user-management')}
+                  >
+                    <Users className="h-4 w-4" />
+                    User Management
+                  </Button>
                   
                   <div className="mt-4 pt-4 border-t">
-                    <Link href="/dashboard/settings" className="w-full">
-                      <Button 
-                        variant="ghost" 
-                        className="justify-start h-10 px-3 text-sm gap-3 hover:bg-accent hover:text-accent-foreground transition-all duration-200 rounded-lg font-medium text-muted-foreground w-full"
-                      >
-                        <Settings className="h-4 w-4" />
-                        Profile Settings
-                      </Button>
-                    </Link>
+                    <Button 
+                      variant="ghost" 
+                      className="justify-start h-10 px-3 text-sm gap-3 hover:bg-accent hover:text-accent-foreground transition-all duration-200 rounded-lg font-medium text-muted-foreground w-full"
+                      onClick={() => handleNavigation('/dashboard/settings')}
+                    >
+                      <Settings className="h-4 w-4" />
+                      Profile Settings
+                    </Button>
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button 

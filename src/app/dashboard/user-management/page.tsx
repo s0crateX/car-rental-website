@@ -6,7 +6,7 @@ import { DataTable } from "./components/data-table";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription } from '@/components/ui/drawer';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { db } from '@/config/firebase';
-import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, doc, deleteDoc } from 'firebase/firestore';
 
 // Define the User type based on Firestore structure
 export interface User {
@@ -17,6 +17,7 @@ export interface User {
   phoneNumber: string;
   createdAt: { toDate: () => Date }; // Firestore timestamp
   profileComplete: boolean;
+  emailVerified: boolean;
   profileImageUrl?: string;
   address?: string;
   emergencyContact?: string;
@@ -51,10 +52,20 @@ export default function UserManagementPage() {
     setIsDrawerOpen(true);
   };
 
+  const handleDeleteUser = async (userId: string) => {
+    try {
+      await deleteDoc(doc(db, "users", userId));
+      // The user will be automatically removed from the list due to the real-time listener
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      // You might want to show a toast notification here
+    }
+  };
+
   return (
     <div className="container mx-auto py-10">
       <h1 className="text-3xl font-bold mb-6">User Management</h1>
-      <DataTable columns={columns} data={users} onUserSelect={handleUserSelect} />
+      <DataTable columns={columns} data={users} onUserSelect={handleUserSelect} onDeleteUser={handleDeleteUser} />
 
       <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
         <DrawerContent>

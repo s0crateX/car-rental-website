@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+
+# Disallow admin-specific pages from public indexing
+Disallow: /dashboard/
+Disallow: /login/
+Disallow: /api/
+
+# Allow crawling of public assets
+Allow: /assets/
+Allow: /_next/static/
+
+# Sitemap location
+Sitemap: https://www.genride-portal.com/sitemap.xml
+
+# Crawl delay (optional)
+Crawl-delay: 1

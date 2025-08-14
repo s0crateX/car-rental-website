@@ -31,16 +31,57 @@ const poppins = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "GenRide - Car Rental Service",
-  description: "GenRide is your trusted car rental service in General Santos City. Book reliable and affordable vehicles for your travel needs today.",
+  title: "GenRide Portal - Car Rental Management System | Admin Dashboard",
+  description: "GenRide Portal is a comprehensive car rental management platform for General Santos City. Manage fleet operations, user accounts, document verification, and rental bookings with our advanced admin dashboard. Streamline your car rental business with real-time analytics, automated workflows, and secure document management.",
+  keywords: "car rental management, fleet management system, General Santos City car rental, vehicle rental platform, admin dashboard, car booking system, rental management software, Philippines car rental, GenRide portal, automotive management",
+  authors: [{ name: "GenRide Team" }],
+  creator: "GenRide",
+  publisher: "GenRide",
+  robots: "index, follow",
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://www.genride-portal.com",
+    siteName: "GenRide Portal",
+    title: "GenRide Portal - Advanced Car Rental Management System",
+    description: "Professional car rental management platform for General Santos City. Complete fleet management, user verification, and booking administration in one powerful dashboard.",
+    images: [
+      {
+        url: "/assets/images/logo.png",
+        width: 1200,
+        height: 630,
+        alt: "GenRide Portal - Car Rental Management System",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "GenRide Portal - Car Rental Management System",
+    description: "Comprehensive car rental management platform for General Santos City. Manage your fleet, users, and bookings efficiently.",
+    images: ["/assets/images/logo.png"],
+    creator: "@GenRide",
+  },
+  viewport: "width=device-width, initial-scale=1",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#000000" },
+  ],
+  category: "Business Software",
+  classification: "Car Rental Management System",
   icons: {
     icon: "/assets/images/favicon.ico",
     apple: "/assets/images/apple-touch-icon.png",
+    shortcut: "/assets/images/favicon.ico",
+  },
+  manifest: "/manifest.json",
+  alternates: {
+    canonical: "https://www.genride-portal.com",
   },
 };
 
 
 import { Toaster } from "sonner";
+import { StructuredData, LocalBusinessStructuredData } from "@/components/seo/structured-data";
 
 // Global error handler for unhandled promise rejections
 if (typeof window !== 'undefined') {
@@ -61,6 +102,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <StructuredData />
+        <LocalBusinessStructuredData />
+      </head>
       <body className={`${poppins.variable} font-sans`}>
         <AuthProvider>
           <ThemeProvider

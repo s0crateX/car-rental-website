@@ -16,6 +16,7 @@ import { X } from 'lucide-react';
 import { Car } from '@/types/car';
 import Image from 'next/image';
 import { ImageZoomModal } from '@/components/common/ImageZoomModal';
+import { LeafletMap } from '@/components/common/LeafletMap';
 
 interface CarDetailsProps {
   car: Car;
@@ -63,13 +64,13 @@ export function CarDetails({ car, onClose, onVerification }: CarDetailsProps) {
               <h3 className="font-semibold text-sm sm:text-base">💺 Capacity</h3>
               <div className="grid grid-cols-[max-content_1fr] gap-x-2 sm:gap-x-4 gap-y-1 text-xs sm:text-sm">
                 <p className="font-medium text-muted-foreground">Seats:</p><p>{car.seats}</p>
-                <p className="font-medium text-muted-foreground">Luggage:</p><p>{car.luggage}</p>
+                
               </div>
             </div>
 
             {/* Pricing */}
             <div className="space-y-2 sm:space-y-3 md:col-span-1">
-              <h3 className="font-semibold text-sm sm:text-base">💵 Pricing</h3>
+              <h3 className="font-semibold text-sm sm:text-base">💵 Rate</h3>
               <div className="grid grid-cols-[max-content_1fr] gap-x-2 sm:gap-x-4 gap-y-1 text-xs sm:text-sm">
                 <p className="font-medium text-muted-foreground">Hourly Rate:</p><p>₱{car.hourlyRate}</p>
                 <p className="font-medium text-muted-foreground">Delivery:</p><p>₱{car.deliveryCharge}</p>
@@ -85,6 +86,39 @@ export function CarDetails({ car, onClose, onVerification }: CarDetailsProps) {
                 </div>
               )}
             </div>
+
+            {/* Discounts */}
+            {car.discounts && (
+              <div className="space-y-2 sm:space-y-3 md:col-span-3">
+                <h3 className="font-semibold text-sm sm:text-base">🏷️ Available Discounts</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {car.discounts['3days'] && (
+                    <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+                      <div className="text-center">
+                        <p className="font-medium text-green-800 dark:text-green-200 text-sm sm:text-base">3+ Days</p>
+                        <p className="text-green-600 dark:text-green-400 text-lg font-bold">{car.discounts['3days']}% OFF</p>
+                      </div>
+                    </div>
+                  )}
+                  {car.discounts['1week'] && (
+                    <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                      <div className="text-center">
+                        <p className="font-medium text-blue-800 dark:text-blue-200 text-sm sm:text-base">1+ Week</p>
+                        <p className="text-blue-600 dark:text-blue-400 text-lg font-bold">{car.discounts['1week']}% OFF</p>
+                      </div>
+                    </div>
+                  )}
+                  {car.discounts['1month'] && (
+                    <div className="bg-purple-50 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4">
+                      <div className="text-center">
+                        <p className="font-medium text-purple-800 dark:text-purple-200 text-sm sm:text-base">1+ Month</p>
+                        <p className="text-purple-600 dark:text-purple-400 text-lg font-bold">{car.discounts['1month']}% OFF</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Features */}
             <div className="space-y-2 sm:space-y-3 md:col-span-3">
@@ -109,8 +143,31 @@ export function CarDetails({ car, onClose, onVerification }: CarDetailsProps) {
             {/* Location */}
             <div className="space-y-2 sm:space-y-3 md:col-span-3">
               <h3 className="font-semibold text-sm sm:text-base">📍 Location</h3>
-              <p className="text-xs sm:text-sm">{car.location.address}</p>
-              {/* Optional: Map preview can be added here */}
+              <div className="space-y-3">
+                <p className="text-xs sm:text-sm">{car.location.address}</p>
+                <div className="bg-muted/50 rounded-lg p-3 space-y-2">
+                  <h4 className="font-medium text-xs sm:text-sm text-muted-foreground">Real-time Coordinates:</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium text-muted-foreground">Latitude:</span>
+                      <code className="bg-background px-2 py-1 rounded text-xs font-mono">{car.location.latitude}</code>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium text-muted-foreground">Longitude:</span>
+                      <code className="bg-background px-2 py-1 rounded text-xs font-mono">{car.location.longitude}</code>
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <h4 className="font-medium text-xs sm:text-sm text-muted-foreground">Interactive Map:</h4>
+                  <LeafletMap 
+                    latitude={car.location.latitude}
+                    longitude={car.location.longitude}
+                    address={car.location.address}
+                    className="border-muted"
+                  />
+                </div>
+              </div>
             </div>
 
             {/* Image Gallery */}
@@ -148,6 +205,26 @@ export function CarDetails({ car, onClose, onVerification }: CarDetailsProps) {
                 <CarouselNext className="-right-2 bg-background/50 hover:bg-background/80" />
               </Carousel>
             </div>
+
+            {/* Issue Images */}
+            {car.issueImages && car.issueImages.length > 0 && (
+              <div className="space-y-2 sm:space-y-3 md:col-span-3">
+                <h3 className="font-semibold text-sm sm:text-base">⚠️ Issue Images</h3>
+                <Carousel className="w-full">
+                  <CarouselContent>
+                    {car.issueImages.map((img, index) => (
+                      <CarouselItem key={index} className="basis-1/3 md:basis-1/4 lg:basis-1/5">
+                        <div className="p-1">
+                          <Image src={img} alt={`Issue image ${index + 1}`} width={96} height={96} className="rounded-md object-cover w-full h-16 sm:h-24 cursor-pointer" onClick={() => setSelectedImage(img)} />
+                        </div>
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  <CarouselPrevious className="-left-2 bg-background/50 hover:bg-background/80" />
+                   <CarouselNext className="-right-2 bg-background/50 hover:bg-background/80" />
+                </Carousel>
+              </div>
+            )}
           </div>
         </CardContent>
       </ScrollArea>

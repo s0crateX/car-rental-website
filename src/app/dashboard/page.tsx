@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from '@/config/firebase';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -34,51 +34,58 @@ export default function DashboardPage() {
   const [userGrowthData, setUserGrowthData] = useState<{ name: string; total: number }[]>([]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        // Fetch users
-        const usersQuery = query(collection(db, 'users'), where('userRole', 'in', ['customer', 'car_owner']));
-        const usersSnapshot = await getDocs(usersQuery);
-        const usersData = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as User));
-        setStats(prev => ({ ...prev, totalUsers: usersSnapshot.size }));
-        setRecentUsers(usersData.sort((a, b) => b.createdAt.toDate().getTime() - a.createdAt.toDate().getTime()).slice(0, 5));
+    setLoading(true);
+    const unsubscribers: (() => void)[] = [];
 
-        // Process user growth data
-        const monthlyUserData = usersData.reduce((acc, user) => {
-          const month = user.createdAt.toDate().toLocaleString('default', { month: 'short' });
-          acc[month] = (acc[month] || 0) + 1;
-          return acc;
-        }, {} as Record<string, number>);
+    // Real-time users listener
+    const usersQuery = query(collection(db, 'users'), where('userRole', 'in', ['customer', 'car_owner']));
+    const usersUnsubscribe = onSnapshot(usersQuery, (usersSnapshot) => {
+      const usersData = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as User));
+      setStats(prev => ({ ...prev, totalUsers: usersSnapshot.size }));
+      setRecentUsers(usersData.sort((a, b) => b.createdAt.toDate().getTime() - a.createdAt.toDate().getTime()).slice(0, 5));
 
-        const chartData = Object.keys(monthlyUserData).map(month => ({
-          name: month,
-          total: monthlyUserData[month],
-        }));
-        setUserGrowthData(chartData);
+      // Process user growth data
+      const monthlyUserData = usersData.reduce((acc, user) => {
+        const month = user.createdAt.toDate().toLocaleString('default', { month: 'short' });
+        acc[month] = (acc[month] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
 
-        // Fetch cars
-        const carsQuery = query(collection(db, 'Cars'));
-        const carsSnapshot = await getDocs(carsQuery);
-        const pendingCars = carsSnapshot.docs.filter(doc => doc.data().verificationStatus === 'pending').length;
-        setStats(prev => ({ ...prev, totalCars: carsSnapshot.size, pendingCarApprovals: pendingCars }));
+      const chartData = Object.keys(monthlyUserData).map(month => ({
+        name: month,
+        total: monthlyUserData[month],
+      }));
+      setUserGrowthData(chartData);
 
-        // Fetch pending user documents
-        const pendingDocsUsers = usersData.filter(user => {
-            const documents = user.documents;
-            if (!documents) return false;
-            return Object.values(documents).some((doc) => doc.status === 'pending');
-        });
-        setStats(prev => ({ ...prev, pendingUserDocs: pendingDocsUsers.length }));
+      // Calculate pending user documents
+      const pendingDocsUsers = usersData.filter(user => {
+          const documents = user.documents;
+          if (!documents) return false;
+          return Object.values(documents).some((doc) => doc.status === 'pending');
+      });
+      setStats(prev => ({ ...prev, pendingUserDocs: pendingDocsUsers.length }));
+      
+      setLoading(false);
+    }, (error) => {
+      console.error("Error fetching users data:", error);
+      setLoading(false);
+    });
+    unsubscribers.push(usersUnsubscribe);
 
-      } catch (error) {
-        console.error("Error fetching dashboard data:", error);
-      } finally {
-        setLoading(false);
-      }
+    // Real-time cars listener
+    const carsQuery = query(collection(db, 'Cars'));
+    const carsUnsubscribe = onSnapshot(carsQuery, (carsSnapshot) => {
+      const pendingCars = carsSnapshot.docs.filter(doc => doc.data().verificationStatus === 'pending').length;
+      setStats(prev => ({ ...prev, totalCars: carsSnapshot.size, pendingCarApprovals: pendingCars }));
+    }, (error) => {
+      console.error("Error fetching cars data:", error);
+    });
+    unsubscribers.push(carsUnsubscribe);
+
+    // Cleanup function
+    return () => {
+      unsubscribers.forEach(unsubscribe => unsubscribe());
     };
-
-    fetchData();
   }, []);
 
   if (loading) {

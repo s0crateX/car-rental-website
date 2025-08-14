@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { collection, getDocs, query, where, orderBy, Timestamp } from 'firebase/firestore';
+import { collection, onSnapshot, query, where, orderBy, Timestamp } from 'firebase/firestore';
 import { db } from '@/config/firebase';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -61,17 +61,16 @@ export default function OwnerApprovalHistoryPage() {
   };
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      setLoading(true);
-      const usersRef = collection(db, 'users');
-      const q = query(
-        usersRef,
-        where('userRole', '==', 'car_owner'),
-        where('lastDocumentUpdate', '!=', null),
-        orderBy('lastDocumentUpdate', 'desc')
-      );
-      
-      const querySnapshot = await getDocs(q);
+    setLoading(true);
+    const usersRef = collection(db, 'users');
+    const q = query(
+      usersRef,
+      where('userRole', '==', 'car_owner'),
+      where('lastDocumentUpdate', '!=', null),
+      orderBy('lastDocumentUpdate', 'desc')
+    );
+    
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const processedUsers: User[] = [];
       
       querySnapshot.forEach((doc) => {
@@ -95,9 +94,12 @@ export default function OwnerApprovalHistoryPage() {
       setUsers(processedUsers);
       setFilteredUsers(processedUsers);
       setLoading(false);
-    };
+    }, (error) => {
+      console.error('Error fetching users:', error);
+      setLoading(false);
+    });
 
-    fetchUsers();
+    return () => unsubscribe();
   }, []);
 
   useEffect(() => {

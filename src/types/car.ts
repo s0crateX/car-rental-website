@@ -32,4 +32,10 @@ export interface Car {
   description: string;
   rating: number;
   reviewCount: number;
+  issueImages?: string[];
+  discounts?: {
+    '1month': number; // 15% discount
+    '1week': number;  // 10% discount
+    '3days': number;  // 5% discount
+  };
 }

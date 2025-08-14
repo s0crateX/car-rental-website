@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { collection, getDocs, query, where, doc, updateDoc } from 'firebase/firestore';
+import { collection, onSnapshot, query, where, doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/config/firebase';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -52,11 +52,11 @@ export default function PendingApprovalsPage() {
   const [selectedImageUrl, setSelectedImageUrl] = useState('');
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      setLoading(true);
-      const usersRef = collection(db, 'users');
-      const q = query(usersRef, where('userRole', '==', 'customer'));
-      const querySnapshot = await getDocs(q);
+    setLoading(true);
+    const usersRef = collection(db, 'users');
+    const q = query(usersRef, where('userRole', '==', 'customer'));
+    
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const pendingUsers: User[] = [];
       querySnapshot.forEach((doc) => {
         const userData = doc.data() as Omit<User, 'id'>;
@@ -72,9 +72,12 @@ export default function PendingApprovalsPage() {
       });
       setUsers(pendingUsers);
       setLoading(false);
-    };
+    }, (error) => {
+      console.error('Error fetching users:', error);
+      setLoading(false);
+    });
 
-    fetchUsers();
+    return () => unsubscribe();
   }, []);
 
   const handleUserSelect = (user: User) => {
@@ -100,36 +103,19 @@ export default function PendingApprovalsPage() {
 
     try {
       await updateDoc(userDocRef, updateData);
-
-      // Update local state
-      const updatedUsers = users.map(user => {
-        if (user.id === selectedUser.id) {
-          const newDocuments = { ...user.documents };
-          const docToUpdate = newDocuments[documentName];
-          if (docToUpdate) {
-            docToUpdate.status = status;
-            if (status === 'rejected' && reason) {
-              docToUpdate.rejectionReason = reason;
-            } else {
-              delete docToUpdate.rejectionReason;
-            }
-          }
-          return { ...user, documents: newDocuments };
-        }
-        return user;
-      });
-
-      // After verification, filter out users with no more pending documents
-      const stillPendingUsers = updatedUsers.filter(user => {
-        if (!user.documents) return false;
-        return Object.values(user.documents).some(doc => doc && doc.status && doc.status.toLowerCase() === 'pending');
-      });
-
-      setUsers(stillPendingUsers);
-
-      // If the selected user has no more pending documents, clear the selection
-      const selectedUserStillHasPending = stillPendingUsers.some(user => user.id === selectedUser.id);
-      if (!selectedUserStillHasPending) {
+      
+      // Check if the selected user will have no more pending documents after this update
+      const updatedUser = { ...selectedUser };
+      if (updatedUser.documents[documentName]) {
+        updatedUser.documents[documentName]!.status = status;
+      }
+      
+      const stillHasPending = Object.values(updatedUser.documents).some(
+        doc => doc && doc.status && doc.status.toLowerCase() === 'pending'
+      );
+      
+      // Clear selection if no more pending documents
+      if (!stillHasPending) {
         setSelectedUser(null);
       }
 

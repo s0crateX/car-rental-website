@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/auth-provider";
 import { db } from "@/config/firebase";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, updateDoc, onSnapshot } from "firebase/firestore";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { withConfirmation } from "@/components/hoc/with-confirmation";
 import { Button } from "@/components/ui/button";
@@ -22,16 +22,19 @@ export function ProfilePictureForm() {
 
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      if (user) {
-        const userDocRef = doc(db, "users", user.uid);
-        const userDoc = await getDoc(userDocRef);
-        if (userDoc.exists()) {
-          setProfileImageUrl(userDoc.data().profileImageUrl || null);
-        }
+    if (!user) return;
+
+    const userDocRef = doc(db, "users", user.uid);
+    const unsubscribe = onSnapshot(userDocRef, (doc) => {
+      if (doc.exists()) {
+        setProfileImageUrl(doc.data().profileImageUrl || null);
       }
-    };
-    fetchUserData();
+    }, (error) => {
+      console.error("Error fetching user data:", error);
+      toast.error("Failed to fetch user data.");
+    });
+
+    return () => unsubscribe();
   }, [user]);
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {

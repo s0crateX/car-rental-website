@@ -18,7 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/context/auth-provider";
 import { db } from "@/config/firebase";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, updateDoc, onSnapshot } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -45,20 +45,23 @@ export function GeneralSettingsForm() {
   });
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      if (user) {
-        const userDocRef = doc(db, "users", user.uid);
-        const userDoc = await getDoc(userDocRef);
-        if (userDoc.exists()) {
-          const userData = userDoc.data();
-          form.reset({
-            fullName: userData.fullName || "",
-            email: userData.email || "",
-          });
-        }
+    if (!user) return;
+
+    const userDocRef = doc(db, "users", user.uid);
+    const unsubscribe = onSnapshot(userDocRef, (doc) => {
+      if (doc.exists()) {
+        const userData = doc.data();
+        form.reset({
+          fullName: userData.fullName || "",
+          email: userData.email || "",
+        });
       }
-    };
-    fetchUserData();
+    }, (error) => {
+      console.error("Error fetching user data:", error);
+      toast.error("Failed to fetch user data.");
+    });
+
+    return () => unsubscribe();
   }, [user, form]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {

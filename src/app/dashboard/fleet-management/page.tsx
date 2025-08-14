@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { collection, getDocs, query, where, doc, updateDoc, onSnapshot } from 'firebase/firestore';
+import { collection, query, where, doc, updateDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '@/config/firebase';
 import { Toaster, toast } from 'sonner';
 import { Preloader } from '@/components/common/preloader';
@@ -78,9 +78,7 @@ export default function FleetManagementPage() {
 
       await updateDoc(carDocRef, updateData);
 
-      // Update local state
-      const updatedCars = cars.filter(car => car.id !== selectedCar.id);
-      setCars(updatedCars);
+      // Clear selection since the car will be removed from pending list by real-time listener
       setSelectedCar(null);
 
       toast.success(
